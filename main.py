@@ -1,16 +1,18 @@
 import random
+import numpy as np
 from ursina import *
 
 app = Ursina()
 
 ################################################################################
 
-a_lot_of_cubes = list()
-for x in range(16 * 16):
-	random_color = color.colors[random.choice(color.color_names)]
-	random_position = (random.randint(-10, 10), random.randint(-10, 10), random.randint(-10, 10))
+camera.position = (7.5, 15, -20)
+camera.rotation = (30, 0, 0)
 
-	a_lot_of_cubes.append(Entity(model='cube', texture='white_cube', color=random_color, position=random_position))
+world = np.ones((16, 16), dtype=int)
+for (x, z), value in np.ndenumerate(world):
+	random_color = color.colors[random.choice(color.color_names)]
+	Entity(model='cube', collider='box', texture='white_cube', color=random_color, position=(x, 0, z))
 
 def update():
 	pass
