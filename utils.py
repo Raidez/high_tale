@@ -2,7 +2,6 @@ from PIL import Image
 
 class Spritesheet():
     def __init__(self, uri = None, sprite_count = None, sprite_size = None):
-        self.uvs = None
         self.image = None
         if uri:
             self._load_image(uri, sprite_count, sprite_size)
@@ -46,20 +45,6 @@ class Spritesheet():
             im.paste(texture, box)
 
         sp.image = im
-        sp.uvs = (
-            (1., .5), (.75, 0.), (1., 0.), # under
-            (.5, 1.), (.25, .5), (.5, .5), # top
-            (), (), (), # right
-            (), (), (), # front
-            (), (), (), # left
-            (), (), (), # back
-            (1., .5), (.75, .5), (1., 0.), # under
-            (.5, 1.), (.5, .5), (.25, 1.), # top
-            (), (), (), # right
-            (), (), (), # front
-            (), (), (), # left
-            (), (), () # back
-        )
         return sp
     
 ################################################################################
@@ -117,4 +102,5 @@ if __name__ == "__main__":
 
     a = sp[3, 4]
     im = Spritesheet.create((128, 128), front=sp[4, 4], top=a, back=a, left=a, right=a, under=a)
+    im.show()
     # im.save('assets/furnace.png')
