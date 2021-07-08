@@ -1,6 +1,21 @@
 from PIL import Image
 
 class Spritesheet():
+    uvs = (
+        (1., .5), (.75, 0.), (1., 0.), # under
+        (.5, 1.), (.25, .5), (.5, .5), # top
+        (1., .5), (.75, 0.), (1., 0.), # right
+        (.5, .5), (.25, 0.), (.5, 0.), # front
+        (.25, .5), (0., 0.), (.25, 0.), # left
+        (.75, 1.), (.5, .5), (.75, .5), # back
+        (1., .5), (.75, .5), (1., 0.), # under
+        (.5, 1.), (.5, .5), (.25, 1.), # top
+        (1., .5), (.75, .5), (.75, 0.), # right
+        (.5, .5), (.25, .5), (.25, 0.), # front
+        (.25, .5), (0., .5), (0., 0.), # left
+        (.75, 1.), (.5, 1.), (.5, .5) # back
+    )
+
     def __init__(self, uri = None, sprite_count = None, sprite_size = None):
         self.image = None
         if uri:
@@ -19,6 +34,22 @@ class Spritesheet():
         if not (sprite_count or sprite_size):
             raise ValueError("I can't guess only with image !")
     
+    @property
+    def size(self):
+        return self.sprite_size
+    
+    @size.setter
+    def size(self, value):
+        self.sprite_size = value
+    
+    @property
+    def count(self):
+        return self.sprite_count
+    
+    @count.setter
+    def count(self, value):
+        self.sprite_count = value
+    
     def __getattr__(self, name):
         return getattr(self.image, name)
     
@@ -33,13 +64,21 @@ class Spritesheet():
         return region
     
     @staticmethod
-    def create(sprite_size, *, left, front, back, right, top, under):
+    def create(sprite_size, *, left=None, front=None, back=None, right=None, top=None, under=None, other=None):
+        # récupération/remplissage des côtés vides
+        sides = dict()
+        for side in ("left", "front", "back", "right", "top", "under"):
+            value = locals()[side]
+            sides[side] = value
+            if not value:
+                sides[side] = other
+        
+        # création dynamque de l'image
         sp = Spritesheet()
-        shape = {(0, 1): "left", (1, 1): "front", (2, 1): "back", (3, 1): "right", (1, 0): "top", (2, 0): "under"}
-
         im = Image.new('RGBA', (sprite_size[0] * 4, sprite_size[1] * 2))
+        shape = {(0, 1): "left", (1, 1): "front", (2, 1): "back", (3, 1): "right", (1, 0): "top", (2, 0): "under"}
         for position in shape:
-            texture = locals()[shape[position]]
+            texture = sides[shape[position]]
             x, y = position[0] * sprite_size[0], position[1] * sprite_size[1]
             box = (x, y, x + sprite_size[0], y + sprite_size[1])
             im.paste(texture, box)
@@ -100,7 +139,6 @@ if __name__ == "__main__":
     
     # print(founds)
 
-    a = sp[3, 4]
-    im = Spritesheet.create((128, 128), front=sp[4, 4], top=a, back=a, left=a, right=a, under=a)
+    im = Spritesheet.create((128, 128), front=sp[4, 4], other=sp[3, 4])
     im.show()
     # im.save('assets/furnace.png')
